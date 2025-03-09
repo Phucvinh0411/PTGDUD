@@ -1,68 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import RenderItem from './RenderItem.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [array, setArray] = useState([]);
+  const [error, setError] = useState(null);
 
-  const [result, setReult] = useState(0)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://67cd3623dd7651e464eda7d9.mockapi.io/user');
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error('Too many requests. Please try again later.');
+          }
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setArray(data);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
 
-  const [a, setA] = useState(0)
-  const [b, setB]= useState(0)
+    fetchData();
+  }, []);
 
-  const [calculation, setCalculation]= useState('')
-
-  function handleClick(e) {
-    // console.log('ok');
-    setCalculation(e.target.value)
-  }
-
-  function nhapA(e) {
-    setA(e.target.value)
-  }
-
-  function nhapB(e) {
-    setB(e.target.value)
-  }
-
-  function handleClick(e) {
-    setCalculation(e.target.value)
-    // console.log(calculation);
-  }
-
-  function tinhToan(e) {
-    console.log(calculation);
-    if(calculation=='+'){
-      setReult(parseInt(a)+ parseInt(b))
-    }
-    else if(calculation=='-'){
-      setReult(parseInt(a)- parseInt(b))
-    }
-    else if(calculation=='*'){
-      setReult(parseInt(a)* parseInt(b))
-    }
-    else if(calculation=='/'){
-      setReult(parseInt(a)/ parseInt(b))
-    }
-  }
   return (
     <>
-
-      <input type="text" placeholder='Nhap a' onChange={nhapA}/> <br />
-      <input type="text" placeholder='Nhap b' onChange={nhapB}/> <br />
-      
-      <input type="radio" value='+' name='calcu' onClick={handleClick}/><span>+</span>
-      <input type="radio" value='-' name='calcu' onClick={handleClick}/><span>-</span>
-      <input type="radio" value='*' name='calcu' onClick={handleClick}/><span>*</span>
-      <input type="radio" value='/' name='calcu' onClick={handleClick}/><span>/</span>
-      <br />
-
-      <button onClick={tinhToan}>Ok</button>
-      <br />
-      <span>Ket qua: {result}</span>
+      {error ? (
+        <div className="error">{error}</div>
+      ) : (
+        <ul className='menu'>
+          <RenderItem array={array} />
+        </ul>
+      )}
+      <div>
+        <button>add Item</button>
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
